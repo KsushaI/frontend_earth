@@ -86,9 +86,9 @@ const Chat: React.FC = () => {
 
     try {
       const sendSuccess = await mockSendMessage(inputText);
-      
+
       if (sendSuccess) {
-        setMessages(prev => prev.map(msg => 
+        setMessages(prev => prev.map(msg =>
           msg.id === newMessage.id ? { ...msg, status: 'delivered' } : msg
         ));
 
@@ -99,8 +99,8 @@ const Chat: React.FC = () => {
         throw new Error('Failed to send message');
       }
     } catch (err) {
-      setError('Message failed to send. Please try again.');
-      setMessages(prev => prev.map(msg => 
+      setError('Не удалось отправить сообщение. Пожалуйста, попробуйте ещё раз.');
+      setMessages(prev => prev.map(msg =>
         msg.id === newMessage.id ? { ...msg, status: 'error' } : msg
       ));
     } finally {
@@ -117,15 +117,28 @@ const Chat: React.FC = () => {
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
+  // In your Chat component (add this to the existing code)
+  const handleLogout = () => {
+    // TODO: Add WebSocket disconnection logic here when implemented
+    console.log("Logging out..."); // For now just log to console
+    // For now, just redirect to main page
+    window.location.href = "/"; // Or use your router if you're using one
+  };
+
 
   return (
     <div className="chat-page">
       <div className="chat-content">
         <div className="chat-header">
-          <h1 className="chat-title">Mars-Earth Chat</h1>
-          <div className="connection-status">
-            <span className="status-indicator connected" />
-            <span>Connected as {MOCK_USERNAME}</span>
+          <h1 className="chat-title">Земля-Марс Чат</h1>
+          <div className="header-controls">
+            <div className="connection-status">
+              <span className="status-indicator connected" />
+              <span>Подключен как {MOCK_USERNAME}</span>
+            </div>
+            <button className="logout-btn" onClick={handleLogout}>
+              Выйти
+            </button>
           </div>
         </div>
 
