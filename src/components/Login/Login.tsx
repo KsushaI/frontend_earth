@@ -1,5 +1,20 @@
+import React, { useState } from 'react';
 import './Login.css';
-export const Login = () => {
+
+interface LoginProps {
+  onLogin: (username: string) => void;
+}
+
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
+  const [username, setUsername] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (username.trim()) {
+      onLogin(username.trim());
+    }
+  };
+
   return (
     <div className="container">
       {/* Left Column */}
@@ -19,12 +34,14 @@ export const Login = () => {
             <h1 className="title">Вход в систему</h1>
             <input 
               type="text" 
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               placeholder="Введите имя пользователя" 
               className="input-field"
             />
           </div>
         </div>
-        <div className="half second-half">
+        <div className="half second-half" onClick={handleSubmit}>
           <button className="login-btn"><span>Войти</span></button>
         </div>
       </div>
@@ -41,3 +58,5 @@ export const Login = () => {
     </div>
   );
 }
+
+export default Login;
