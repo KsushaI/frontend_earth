@@ -462,6 +462,7 @@
 }
 
 .message-time {
+  padding-left: 15px;
   font-size: 0.75em;
   opacity: 0.8;
 }
@@ -473,11 +474,14 @@
 
 .message-status {
   position: absolute;
+  padding-left: 5px;
   bottom: 5px;
   right: 10px;
-  font-size: 12px;
+  font-size: 14px;
   display: flex;
   align-items: center;
+  color: #f44336;
+
 }
 
 .message-status .error {
