@@ -27,7 +27,7 @@ paths:
         200:
           description: Сообщение успешно разослано
 
-  /receiveResponse:
+  /ReceiveResponse:
     post:
       tags:
         - Earth
@@ -65,15 +65,7 @@ components:
     Status:
       type: object
       properties:
-        messageId:
-          type: integer
         status:
-          type: string
-          enum: [delivered, error]
-        timestamp:
-          type: string
-          format: date-time
+          type: boolean
       required:
-        - messageId
         - status
-        - timestamp
