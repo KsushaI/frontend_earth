@@ -148,7 +148,7 @@ wss.on('connection', (ws, req) => {
             `http://${TRANSPORT_LEVEL_HOST}:${TRANSPORT_LEVEL_PORT}/send`,
             {
               username: username,
-              text: message.text,
+              data: message.text,
               send_time: earthMessage.timestamp
             }
           );
