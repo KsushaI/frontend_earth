@@ -18,7 +18,7 @@
 
 /* Wrapper for chat content */
 .chat-content {
-  width: 60%;
+  width: 55%;
   max-width: 900px;
   display: flex;
   flex-direction: column;
@@ -208,6 +208,12 @@
   border-radius: 14px;
   cursor: pointer;
   font-weight: bold;
+  min-width: 100px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .send-btn:disabled {
@@ -215,26 +221,67 @@
   cursor: not-allowed;
 }
 
-.error-message {
-  color: #f44336;
-  font-style: italic;
-  margin-top: 10px;
-  text-align: center;
+.send-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: white;
+  display: none; /* Hidden by default */
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
 }
 
-/* Fade-in animation for new messages */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+.send-btn:hover svg {
+  transform: rotate(45deg) scale(1.1);
+}
+
+/* Add media query for screens up to 450px */
+@media (max-width: 450px) {
+  /* Keep button next to input on all screen sizes */
+  .message-input-container {
+    flex-direction: row;
+    align-items: center;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  /* Force fixed size and circular shape for small screens */
+  .send-btn {
+    width: 50px;
+    height: 50px;
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Hide text and show plane icon only on small screens */
+  .send-btn .send-text {
+    display: none;
+  }
+  
+   /* Hide text if you keep it in JSX */
+   .send-btn span:not(svg) {
+    display: none;
+  }
+
+  /* Show the inline SVG only on small screens */
+  .send-btn svg {
+    display: block;
+  }
+  
+  /* Adjust message styling for small screens */
+  .message {
+    max-width: 90%;
+    font-size: 14px;
+  }
+  
+  .message-content {
+    font-size: 14px;
   }
 }
 
-/* Mobile-specific styles */
+/* Mobile-specific styles (update existing media query) */
 @media (max-width: 768px) {
   .chat-content {
     width: 95%;
@@ -254,7 +301,7 @@
   }
 
   .message-status {
-    position: absolute !important; /* Keep absolute positioning */
+    position: absolute;
     bottom: 2px;
     right: 5px;
     padding: 4px 5px;
@@ -262,26 +309,18 @@
     font-size: 14px;
     display: block;
   }
- 
 
   .message-status.error {
-    font-size: 18px; /* Even bigger ❌ */
-   
+    font-size: 18px;
   }
+  
   .message-content {
     padding-right: 4px;
   }
 
+  /* Remove conflicting styles for message input container */
   .message-input-container {
-    flex-direction: column;
-  }
-
-  .send-btn {
-    width: 100%;
-    padding: 12px;
+    flex-direction: row;
   }
 }
 
-.message {
-  animation: fadeIn 0.3s ease-out;
-}

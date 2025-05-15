@@ -9,6 +9,8 @@ const swaggerUi = require('swagger-ui-express');
 const EARTH_PORT = 8005;
 const TRANSPORT_LEVEL_HOST = 'localhost';
 const TRANSPORT_LEVEL_PORT = 8002;
+//const TRANSPORT_LEVEL_HOST = '192.168.80.254';
+//const TRANSPORT_LEVEL_PORT = 8080;
 const ENABLE_TRANSPORT = true;
 
 const app = express();
@@ -41,33 +43,6 @@ function broadcastToOthers(senderWs, message) {
   });
 }
 
-/*function broadcastStatusUpdate(message, status) {
-  const statusUpdate = {
-    type: 'status-update',
-    text: message.text,
-    sender: message.sender,
-    timestamp: message.timestamp,
-    status: status,
-    updateTime: new Date().toISOString()
-  };
-
-  activeConnections.forEach(sockets => {
-    sockets.forEach(ws => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(statusUpdate));
-      }
-    });
-  });
-
-  // Remove message from pending list
-  const msgIndex = pendingMessages.findIndex(m => 
-    m.text === message.text && 
-    m.timestamp === message.timestamp
-  );
-  if (msgIndex >= 0) {
-    pendingMessages.splice(msgIndex, 1);
-  }
-}*/
 function broadcastStatusUpdate(message, status) {
   const statusUpdate = {
     type: 'status-update',
@@ -82,7 +57,7 @@ function broadcastStatusUpdate(message, status) {
   activeConnections.forEach(sockets => {
     sockets.forEach(ws => {
       if (ws.readyState === WebSocket.OPEN) {
-        console.log(message.id)
+        console.log("message_id: ", message.id)
         ws.send(JSON.stringify(statusUpdate));
       }
     });
@@ -99,21 +74,20 @@ app.post('/ReceiveResponse', (req, res) => {
   req.on('data', chunk => body += chunk);
   req.on('end', () => {
     try {
-      const { success } = JSON.parse(body);
-      const status = success ? 'delivered' : 'error';
+      const { status} = JSON.parse(body);
+      const delivery_status = status ? 'delivered' : 'error';
       
       console.log(`\n=== Delivery Status ===`);
-      console.log(`Success: ${success}`);
-      console.log(`Processing as: ${status}`);
+      console.log(`Processing as: ${delivery_status}`);
       
       if (pendingMessages.length > 0) {
         const message = pendingMessages.shift();
         message.status = status;
-        broadcastStatusUpdate(message, status);
+        broadcastStatusUpdate(message, delivery_status);
         console.log(`Updated message status`);
       }
        // 4. Return proper response (matches Swagger)
-       res.status(200).json({ message: 'Квитанция' });
+       res.status(200).json({ message: 'Квитанция получена' });
     } catch (e) {
       //console.error('Error processing status:', e);
       console.error('Error processing status:', e);
@@ -140,8 +114,9 @@ wss.on('connection', (ws, req) => {
   }
   activeConnections.get(username).add(ws);
 
+  const connectedUsernames = Array.from(activeConnections.keys());
   console.log(`🌍 User connected: ${username} (${activeConnections.get(username).size} connections)`);
-
+  console.log(`📊 Total users: ${connectedUsernames.length} | Online: [${connectedUsernames.join(', ')}]`);
   // Send message history
   ws.send(JSON.stringify({
     type: 'history',
@@ -170,25 +145,13 @@ wss.on('connection', (ws, req) => {
       if (ENABLE_TRANSPORT) {
         try {
           await axios.post(
-            `http://${TRANSPORT_LEVEL_HOST}:${TRANSPORT_LEVEL_PORT}/send_to_mars`,
+            `http://${TRANSPORT_LEVEL_HOST}:${TRANSPORT_LEVEL_PORT}/send`,
             {
               username: username,
-              data: message.text,
+              text: message.text,
               send_time: earthMessage.timestamp
-            },
-            { headers: {} }
+            }
           );
-        /*} catch (error) {
-          const msgIndex = pendingMessages.findIndex(m => 
-            m.text === earthMessage.text && 
-            m.timestamp === earthMessage.timestamp
-          );
-          if (msgIndex >= 0) {
-            pendingMessages[msgIndex].status = 'error';
-            broadcastStatusUpdate(pendingMessages[msgIndex], 'error');
-            pendingMessages.splice(msgIndex, 1);
-          }
-        }*/
         } catch (error) {
           const msgIndex = pendingMessages.findIndex(m => m.id === earthMessage.id);
           if (msgIndex >= 0) {
@@ -214,6 +177,9 @@ wss.on('connection', (ws, req) => {
       if (userConnections.size === 0) {
         activeConnections.delete(username);
       }
+
+      const connectedUsernames = Array.from(activeConnections.keys());
+      console.log(`📊 Total users: ${connectedUsernames.length} | Online: [${connectedUsernames.join(', ')}]`);
     }
   });
 });
@@ -224,17 +190,17 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-function getLocalIpAddress() {
+/*function getLocalIpAddress() {
   return Object.values(require('os').networkInterfaces())
     .flat()
     .find(i => i.family === 'IPv4' && !i.internal)?.address || 'localhost';
-}
+}*/
 
 server.listen(EARTH_PORT, '0.0.0.0', () => {
   console.log(`
   🌍 Earth Chat Server running
   Local: http://localhost:${EARTH_PORT}
-  Network: http://${getLocalIpAddress()}:${EARTH_PORT}
-  WebSocket: ws://${getLocalIpAddress()}:${EARTH_PORT}
+  Network: http://ip_address:${EARTH_PORT}
+  WebSocket: ws://ip_address:${EARTH_PORT}
   `);
 });

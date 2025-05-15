@@ -11,7 +11,7 @@ servers:
     description: Mars WebSocket server
 
 paths:
-  /receiveMessage:
+  /ReceiveMessage:
     post:
       tags:
         - Mars
@@ -48,19 +48,19 @@ components:
     Message:
       type: object
       properties:
-        sender:
+        Username:
           type: string
-        text:
+        Text:
           type: string
-        timestamp:
+        SendTime:
           type: string
           format: date-time
-        isError:
+        Error:
           type: boolean
       required:
-        - sender
-        - text
-        - timestamp
+        - Username
+        - Text
+        - SendTime
 
     Status:
       type: object
