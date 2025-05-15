@@ -132,7 +132,7 @@ wss.on('connection', (ws, req) => {
       const earthMessage = {
         id: message.id ,
         text: message.text,
-        sender: username,
+        sender: message.sender,
         timestamp: message.timestamp,
         status: 'sent'
       };
