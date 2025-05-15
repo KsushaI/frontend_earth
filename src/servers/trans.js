@@ -12,9 +12,9 @@ const pendingDeliveries = [];
 // Message Acceptance Endpoint
 app.post('/send', (req, res) => {
   try {
-    const { username, text } = req.body;
+    const { username, data } = req.body;
 
-    if (!username || !text) {
+    if (!username || !data) {
       return res.status(400).json({ error: "username and data are required" });
     }
 
@@ -23,7 +23,7 @@ app.post('/send', (req, res) => {
     pendingDeliveries.push({
       id: deliveryId,
       username,
-      text,
+      data,
       status: 'processing'
     });
 
