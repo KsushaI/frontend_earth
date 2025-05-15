@@ -133,7 +133,7 @@ wss.on('connection', (ws, req) => {
         id: message.id ,
         text: message.text,
         sender: username,
-        timestamp: new Date().toISOString(),
+        timestamp: message.timestamp,
         status: 'sent'
       };
 
@@ -147,8 +147,8 @@ wss.on('connection', (ws, req) => {
           await axios.post(
             `http://${TRANSPORT_LEVEL_HOST}:${TRANSPORT_LEVEL_PORT}/send`,
             {
-              username: username,
-              data: message.text,
+              username: earthMessage.sender,
+              data: earthMessage.text,
               send_time: earthMessage.timestamp
             }
           );
