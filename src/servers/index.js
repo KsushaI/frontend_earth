@@ -69,14 +69,14 @@ function broadcastStatusUpdate(message, status) {
   }
 }
 
-app.post('/ReceiveResponse', (req, res) => {
+/*app.post('/ReceiveResponse', (req, res) => {
   let body = '';
   req.on('data', chunk => body += chunk);
   req.on('end', () => {
     try {
       const { status} = JSON.parse(body);
       const delivery_status = status ? 'delivered' : 'error';
-      
+      console.log(body)
       console.log(`\n=== Delivery Status ===`);
       console.log(`Processing as: ${delivery_status}`);
       
@@ -96,6 +96,36 @@ app.post('/ReceiveResponse', (req, res) => {
     
     //res.end();
   });
+});*/
+
+app.post('/ReceiveResponse', (req, res) => {
+  console.log("we are here!")
+  console.log("Headers:", req.headers);
+  console.log("Raw Body:", req.body);
+  const { status } = req.body;
+  console.log(status)
+  
+  // Validate structure
+  if (typeof status !== 'boolean') {
+    return res.status(400).json({
+      error: 'Missing or invalid "status" boolean field',
+      received: req.body
+    });
+  }
+  console.log(req.body)
+  const delivery_status = status ? 'delivered' : 'error';
+
+  console.log(`\n=== Delivery Status ===`);
+  console.log(`Processing as: ${delivery_status}`);
+
+  if (pendingMessages.length > 0) {
+    const message = pendingMessages.shift();
+    message.status = status;
+    broadcastStatusUpdate(message, delivery_status);
+    console.log(`Updated message status`);
+  }
+
+  res.status(200).json({ message: 'Квитанция получена' });
 });
 
 // WebSocket connection handler
@@ -152,6 +182,7 @@ wss.on('connection', (ws, req) => {
               send_time: earthMessage.timestamp
             }
           );
+          console.log(earthMessage.sender, earthMessage.text, earthMessage.timestamp)
         } catch (error) {
           const msgIndex = pendingMessages.findIndex(m => m.id === earthMessage.id);
           if (msgIndex >= 0) {
